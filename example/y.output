@@ -1,0 +1,96 @@
+   0  $accept : statement $end
+
+   1  statement : NAME '=' expression
+   2            | expression
+
+   3  expression : expression '+' NUMBER
+   4             | expression '-' NUMBER
+   5             | NUMBER
+
+state 0
+	$accept : . statement $end  (0)
+
+	NAME  shift 1
+	NUMBER  shift 2
+	.  error
+
+	statement  goto 3
+	expression  goto 4
+
+
+state 1
+	statement : NAME . '=' expression  (1)
+
+	'='  shift 5
+	.  error
+
+
+state 2
+	expression : NUMBER .  (5)
+
+	.  reduce 5
+
+
+state 3
+	$accept : statement . $end  (0)
+
+	$end  accept
+
+
+state 4
+	statement : expression .  (2)
+	expression : expression . '+' NUMBER  (3)
+	expression : expression . '-' NUMBER  (4)
+
+	'+'  shift 6
+	'-'  shift 7
+	$end  reduce 2
+
+
+state 5
+	statement : NAME '=' . expression  (1)
+
+	NUMBER  shift 2
+	.  error
+
+	expression  goto 8
+
+
+state 6
+	expression : expression '+' . NUMBER  (3)
+
+	NUMBER  shift 9
+	.  error
+
+
+state 7
+	expression : expression '-' . NUMBER  (4)
+
+	NUMBER  shift 10
+	.  error
+
+
+state 8
+	statement : NAME '=' expression .  (1)
+	expression : expression . '+' NUMBER  (3)
+	expression : expression . '-' NUMBER  (4)
+
+	'+'  shift 6
+	'-'  shift 7
+	$end  reduce 1
+
+
+state 9
+	expression : expression '+' NUMBER .  (3)
+
+	.  reduce 3
+
+
+state 10
+	expression : expression '-' NUMBER .  (4)
+
+	.  reduce 4
+
+
+7 terminals, 3 nonterminals
+6 grammar rules, 11 states
